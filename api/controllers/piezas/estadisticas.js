@@ -1,6 +1,6 @@
 module.exports = {
   friendlyName: 'Estadísticas de piezas',
-  description: 'Retorna el total y el conteo agrupado por tipo.',
+  description: 'Retorna el total y conteos agrupados por campo.',
 
   inputs: {},
 
@@ -9,24 +9,27 @@ module.exports = {
       description: 'Finalización satisfactoria',
       responseType: 'okResponse',
     },
-    errorGeneral: {
-      description: 'Un error sin identificar generado en el try/catch.',
-      responseType: 'nokResponse',
-    },
   },
 
   fn: async function (inputs, exits) {
     sails.log.verbose('-----> Estadísticas de piezas');
-    try {
-      const todas = await sails.helpers.cargarExcel.with({ accion: 'obtenerTodos' });
-      const porTipo = todas.reduce((acc, p) => {
-        acc[p.tipo] = (acc[p.tipo] || 0) + 1;
-        return acc;
-      }, {});
-      return exits.success({ total: todas.length, porTipo });
-    } catch (error) {
-      sails.log.error('Error al obtener estadísticas', error);
-      return exits.errorGeneral(error.message);
-    }
+
+    const todas = await sails.helpers.cargarExcel.with({ accion: 'obtenerTodos' });
+
+    return exits.success({
+      total:         todas.length,
+      porColeccion:  agrupar(todas, 'coleccion'),
+      porArea:       agrupar(todas, 'area'),
+      porCultura:    agrupar(todas, 'cultura'),
+      porPeriodo:    agrupar(todas, 'periodo'),
+    });
   },
 };
+
+function agrupar(arr, campo) {
+  return arr.reduce((acc, p) => {
+    const valor = p[campo] && p[campo].trim() !== '' ? p[campo] : 'Sin clasificar';
+    acc[valor] = (acc[valor] || 0) + 1;
+    return acc;
+  }, {});
+}
