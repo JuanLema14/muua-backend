@@ -133,6 +133,8 @@ lib-cov
 *.pid
 
 # Archivos del museo
+node_modules/
+.env
 data/
 assets/imagenes/
 
