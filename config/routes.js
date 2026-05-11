@@ -13,4 +13,5 @@ module.exports.routes = {
   'GET /api/piezas/buscar':  { action: 'piezas/buscar' },
   'GET /api/piezas/:codigo': { action: 'piezas/detalle' },
   'GET /api/estadisticas':   { action: 'piezas/estadisticas' },
+  'POST /api/reporte':       { action: 'piezas/reporte' }
 };
