@@ -7,6 +7,7 @@
   "dependencies": {
     "@sailshq/lodash": "^3.10.7",
     "exceljs": "^4.4.0",
+    "pdfkit": "^0.18.0",
     "sails": "^1.5.17",
     "sails-hook-orm": "^4.0.3",
     "sails-hook-sockets": "^3.0.0",
