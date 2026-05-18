@@ -11,10 +11,11 @@
 
 module.exports.bootstrap = async function (done) {
   try {
-    await sails.helpers.cargarExcel.with({ accion: 'cargar' });
-    return done();
+    await sails.helpers.cargarExcel.with({ accion: 'cargar' })
+    await sails.helpers.mycloudImages.with({ accion: 'cargar' })
+    return done()
   } catch (error) {
-    sails.log.error('Error al cargar el Excel en bootstrap:', error);
-    return done(error);
+    sails.log.error('Error en bootstrap:', error)
+    return done(error)
   }
-};
+}
