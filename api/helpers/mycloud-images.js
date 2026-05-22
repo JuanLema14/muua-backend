@@ -42,7 +42,7 @@ module.exports = {
 
         const TOKEN = sails.config.mycloud.accessToken;
         const datos = await fetchJson(url, TOKEN);
-        console.log("datos:", datos);
+
         if (!datos || !datos.files) break;
 
         for (const archivo of datos.files) {
@@ -97,26 +97,38 @@ module.exports = {
 };
 
 // Fetch simple sin dependencias externas
-function fetchJson(url, token) {
+function fetchJson(url, token, redirectCount = 0) {
   return new Promise((resolve, reject) => {
+    if (redirectCount > 5) return reject(new Error('Demasiadas redirecciones'))
+
     const options = {
       headers: {
-        Authorization: `Bearer ${token}`,
-        Accept: "application/json",
-      },
-    };
-    https
-      .get(url, options, (res) => {
-        let data = "";
-        res.on("data", (chunk) => (data += chunk));
-        res.on("end", () => {
-          try {
-            resolve(JSON.parse(data));
-          } catch (e) {
-            resolve(null);
-          }
-        });
+        'Authorization': `Bearer ${token}`,
+        'Accept': 'application/json',
+      }
+    }
+
+    https.get(url, options, (res) => {
+      // Seguir redirecciones 301, 302, 307, 308
+      if ([301, 302, 307, 308].includes(res.statusCode) && res.headers.location) {
+        sails.log.info('Redirigiendo a:', res.headers.location)
+        // Consumir el body para liberar el socket
+        res.resume()
+        return resolve(fetchJson(res.headers.location, token, redirectCount + 1))
+      }
+
+      let data = ''
+      res.on('data', chunk => data += chunk)
+      res.on('end', () => {
+        try { resolve(JSON.parse(data)) }
+        catch (e) {
+          sails.log.error('Error parseando JSON:', data.substring(0, 200))
+          resolve(null)
+        }
       })
-      .on("error", reject);
-  });
+    }).on('error', (err) => {
+      sails.log.error('Error en fetchJson:', err.message)
+      reject(err)
+    })
+  })
 }
