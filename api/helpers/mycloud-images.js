@@ -62,7 +62,7 @@ module.exports = {
         pagina++;
 
         // Seguridad: máximo 50 páginas (5000 archivos)
-        if (pagina > 10) break;
+        if (pagina > 20) break;
       } while (pageToken);
 
       cargado = true;
