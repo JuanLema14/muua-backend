@@ -266,7 +266,7 @@ module.exports = {
     *                                                                          *
     ***************************************************************************/
     onlyAllowOrigins: [
-      'https://antropologia-muua.vercel.app/'
+      'https://antropologia-muua.vercel.app'
     ],
 
 
